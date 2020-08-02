@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">MegaCalc</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="pad_root">√</string>
+    <string name="pad_ac">AC</string>
+    <string name="pad_bs">BS</string>
+    <string name="pad_plus">＋</string>
+    <string name="pad_minus">－</string>
+    <string name="pad_mul">×</string>
+    <string name="pad_div">÷</string>
+    <string name="pad_0">0</string>
+    <string name="pad_1">1</string>
+    <string name="pad_2">2</string>
+    <string name="pad_3">3</string>
+    <string name="pad_4">4</string>
+    <string name="pad_5">5</string>
+    <string name="pad_6">6</string>
+    <string name="pad_7">7</string>
+    <string name="pad_8">8</string>
+    <string name="pad_9">9</string>
+</resources>
