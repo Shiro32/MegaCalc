@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
 
         padMode = PAD_MODE_NUM1
         numPadString1="0"
-        numLCD.text = "MegaCalc 1.0"
+        numLCD.text = "Welcome!"
         pastLCD.text = "(c)2020 Shiro, フォトポタ日記"
 
 //        val fontSize = calcButtonTextSize(btn7)
@@ -110,7 +110,7 @@ class MainActivity : AppCompatActivity() {
                             if( numPadString2!="" || opPadString==getString(R.string.pad_root)) {
                                 val result = calc(numPadString1, opPadString, numPadString2)
 
-                                pastLCD.text = "%s %s %s = %s".format(numPadString1, opPadString, numPadString2, result)
+                                pastLCD.text = "%s %s %s =".format(numPadString1, opPadString, numPadString2)
                                 numPadString1 = result
                                 numLCD.text = numPadString1
                                 numPadString2 = ""
@@ -253,7 +253,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        return "%.9s".format(ret.toString())
+        // なぜか整数でも「.0」と表示されてしまうので、強引にサプレスする
+        if( ret==ret.toInt().toDouble() ) {
+            return "%.9s".format(ret.toInt().toString() )
+        } else {
+            return "%.9s".format(ret.toString())
+        }
     }
 
     // ボタンテキストをいつでも最大化しよう！

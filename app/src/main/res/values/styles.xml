@@ -7,4 +7,13 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+
+    <style name="PadButtonStyle">
+        <item name="android:textColor">@android:color/tertiary_text_light</item>
+        <item name="android:layout_margin">0dp</item>
+        <item name="android:textSize">80dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@android:drawable/btn_default</item>
+    </style>
+
 </resources>

@@ -25,6 +25,7 @@
 
             <Button
                 android:id="@+id/btnPlus"
+                style="@style/PadButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -35,6 +36,7 @@
 
             <Button
                 android:id="@+id/btnMinus"
+                style="@style/PadButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -53,6 +55,7 @@
 
             <Button
                 android:id="@+id/btnMul"
+                style="@style/PadButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -63,6 +66,7 @@
 
             <Button
                 android:id="@+id/btnDiv"
+                style="@style/PadButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -81,6 +85,7 @@
 
             <Button
                 android:id="@+id/btnAC2"
+                style="@style/PadButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -91,6 +96,7 @@
 
             <Button
                 android:id="@+id/btnRoot"
+                style="@style/PadButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
