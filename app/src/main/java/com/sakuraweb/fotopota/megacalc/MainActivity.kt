@@ -1,19 +1,25 @@
 package com.sakuraweb.fotopota.megacalc
 
+import android.graphics.Paint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.util.TypedValue
+import android.widget.Button
 import androidx.viewpager.widget.ViewPager
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_num_pad.*
 
 var opPadString: String = ""
+
+const val MIN_BUTTON_TEXT_SIZE = 10F
 
 const val PAD_MODE_NUM1 = 1     // 左辺の数字（数字１）を入れている状態
 const val PAD_MODE_OP   = 2     // 演算子を入れている状態
 const val PAD_MODE_NUM2 = 3     // 右辺の数字（数字２）を入れている状態
 
 var padMode = PAD_MODE_NUM1
-var numPadString1: String = "0"
+var numPadString1: String = ""
 var numPadString2: String = ""
 
 class MainActivity : AppCompatActivity() {
@@ -30,7 +36,10 @@ class MainActivity : AppCompatActivity() {
 
         padMode = PAD_MODE_NUM1
         numPadString1="0"
-        numLCD.text = "0"
+        numLCD.text = "MegaCalc 1.0"
+        pastLCD.text = "(c)2020 Shiro, フォトポタ日記"
+
+//        val fontSize = calcButtonTextSize(btn7)
     }
 
     // 計算パッドの画面変更リスナー
@@ -44,26 +53,34 @@ class MainActivity : AppCompatActivity() {
 
             // positionは遷移確定後のページ（NUM_PAD / OP_PAD）
             when (position) {
-                FRAGMENT_NUM_PAD -> {
-                    // 数字パッド画面。以下の２パターンがあり、演算子(opPadString）の有無で見分けている
-                    // 　１．演算子を入力して戻ってくるケース
-                    // 　２．演算子を入れてないけどスワイプで戻ってくるケース
 
-                    when (opPadString ) {
-                        // ルート（√）計算
-                        // 単項演算子なので、数字２を入れる必要が無く、これで計算完了
-                        // 計算完了時は OP_PAD画面にいる必要があるため遷移させる
-                        getString(R.string.pad_root) -> {
-                            padMode = PAD_MODE_NUM2
-                            padPager.currentItem = FRAGMENT_OP_PAD
+                // 数字パッド画面。以下の２パターンがあり、演算子(opPadString）の有無で見分けている
+                // 　１．演算子を入力して戻ってくるケース
+                // 　２．演算子を入れてないけどスワイプで戻ってくるケース
+                FRAGMENT_NUM_PAD -> {
+
+                    when (padMode) {
+
+                        // 数字１の入力中に、OPに行ってNUMに戻ってきたパターン
+                        PAD_MODE_NUM1 -> {
                         }
 
-                        // OP_PADからスワイプで戻ってきたケース
-                        "" -> {
-                            if (padMode == PAD_MODE_NUM1) {
-                                // まだ、数字１の入力途中なので何もしない
+                        // 演算子入力中にスワイプで戻ってきた（＝数字の修正）
+                        PAD_MODE_OP -> {
+                            // 単項演算子（√）は、OPモード・演算子ありで完了
+                            if (opPadString !== "") {
+                                padMode = PAD_MODE_NUM2
+                                padPager.currentItem = FRAGMENT_OP_PAD
                             } else {
-                                // 計算完了状態から強引に戻ってきたらAC扱い
+                                padMode = PAD_MODE_NUM1
+                            }
+                        }
+
+                        // 計算完了状態で戻ってきたらＡＣ扱い
+                        // それ以外は順当に数字２の入力をする
+                        PAD_MODE_NUM2 -> {
+                            if (opPadString == "") {
+                                //　計算完了状態からスワイプして戻ってきたのでAC扱い
                                 numPadString1 = "0"
                                 numLCD.text = numPadString1
                                 padMode = PAD_MODE_NUM1
@@ -74,18 +91,35 @@ class MainActivity : AppCompatActivity() {
 
                 FRAGMENT_OP_PAD -> {
                     // 演算子パッド画面。以下の２パターンがある
-                    // １．数字１の入力が終わり、自動遷移してくるケース
-
+                    // １．数字１の入力が終わり、自動遷移してくるケース　MODE_NUM1
+                    // ２．数字２の入力が終わり、自動遷移してくるケース MODE_NUM2
+                    // ３．何も入れてないけど、スワイプしてくるケース
+                    // ４．数字２を入れ終わってないのに、スワイプしてくるケース
 
                     when (padMode) {
+                        // 数字１の入力が終わり、自動遷移してくるケース　MODE_NUM1
                         PAD_MODE_NUM1 -> {
+                            // 演算子入力モードに遷移する
+                            padMode = PAD_MODE_OP
                         }
+                        // 演算子入力中に、NUM_PADに行って、さらにOP_PADに戻る
+                        PAD_MODE_OP -> {
+                        }
+                        // 数字２の入力中、入力完了でOP画面にくる
                         PAD_MODE_NUM2 -> {
-                            numPadString1 = calc( numPadString1, opPadString, numPadString2)
-                            numLCD.text = numPadString1
-                            numPadString2 = ""
-                            opPadString = ""
-                            opLCD.text = ""
+                            if( numPadString2!="" || opPadString==getString(R.string.pad_root)) {
+                                val result = calc(numPadString1, opPadString, numPadString2)
+
+                                pastLCD.text = "%s %s %s = %s".format(numPadString1, opPadString, numPadString2, result)
+                                numPadString1 = result
+                                numLCD.text = numPadString1
+                                numPadString2 = ""
+                                opPadString = ""
+                                opLCD.text = ""
+
+                            } else {
+                                padMode = PAD_MODE_OP
+                            }
                         }
                     }
                 }
@@ -100,7 +134,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun startTimerToOpPad() {
-        mHandler.postDelayed(changeToOpPad, 500)
+        mHandler.postDelayed(changeToOpPad, 800)
     }
     private fun stopTimerToOpPad() {
         mHandler.removeCallbacks(changeToOpPad)
@@ -183,13 +217,14 @@ class MainActivity : AppCompatActivity() {
     // TODO: いずれはnum_padから自動で飛んでくるようにする（Swipeではなく0.2秒くらいで）
     open fun clickOpPad( char: String ) {
         when( char ) {
-            getString(R.string.pad_plus), getString(R.string.pad_mul), getString(R.string.pad_div) -> {
+            getString(R.string.pad_plus), getString(R.string.pad_mul), getString(R.string.pad_div), getString(R.string.pad_minus) -> {
                 opPadString = char
                 padMode = PAD_MODE_NUM2
                 opLCD.text = opPadString
             }
             getString(R.string.pad_root) -> {
                 opPadString = char
+                padMode = PAD_MODE_OP
             }
             getString(R.string.pad_ac) -> {
                 opPadString = ""
@@ -219,6 +254,42 @@ class MainActivity : AppCompatActivity() {
         }
 
         return "%.9s".format(ret.toString())
+    }
+
+    // ボタンテキストをいつでも最大化しよう！
+    fun calcButtonTextSize( b: Button) : Float {
+        val text = b.text.toString()
+
+        val padding = b.paddingLeft
+        val paint = Paint()
+
+        val viewWidth = b.width - (padding*2)
+        val viewHeight = b.height - (padding*2)
+
+        var textSize = 200F
+
+        paint.textSize = textSize
+        var fm = paint.getFontMetrics()
+        var textHeight = (Math.abs(fm.top))+(Math.abs(fm.descent))
+        var textWidth = paint.measureText(text)
+
+        while( viewWidth < textWidth || viewHeight < textHeight) {
+            if( MIN_BUTTON_TEXT_SIZE >= textSize ) {
+                textSize = MIN_BUTTON_TEXT_SIZE
+                break
+            }
+            textSize -= 8F
+
+            fm = paint.getFontMetrics()
+            textHeight = (Math.abs(fm.top)) + (Math.abs(fm.descent))
+            textWidth = paint.measureText(text)
+        }
+
+        b.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize)
+
+        return textSize
+
+
     }
 
 
