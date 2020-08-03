@@ -10,7 +10,10 @@ import androidx.viewpager.widget.ViewPager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_num_pad.*
 
-var opPadString: String = ""
+// TODO: 桁あふれ時のEが無視されて、少数だけになってしまう・・・ （やっぱり、calc関数を大幅拡大せねば）
+// TODO: 左スクロールで設定画面
+// TODO: 起動時に、何桁表示できるかをチェックしよう（whileで探すしかないか？）
+// TODO: フォントの二重重ねによる薄表示やりたい（完全モノスペースフォントが必要）
 
 const val MIN_BUTTON_TEXT_SIZE = 10F
 
@@ -21,6 +24,8 @@ const val PAD_MODE_NUM2 = 3     // 右辺の数字（数字２）を入れてい
 var padMode = PAD_MODE_NUM1
 var numPadString1: String = ""
 var numPadString2: String = ""
+var opPadString: String = ""
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,10 +41,9 @@ class MainActivity : AppCompatActivity() {
 
         padMode = PAD_MODE_NUM1
         numPadString1="0"
-        numLCD.text = "Welcome!"
-        pastLCD.text = "(c)2020 Shiro, フォトポタ日記"
+        numLCD.text = "hello"
+        pastLCD.text = "(c)2020 5hiro"
 
-//        val fontSize = calcButtonTextSize(btn7)
     }
 
     // 計算パッドの画面変更リスナー
@@ -62,16 +66,19 @@ class MainActivity : AppCompatActivity() {
                     when (padMode) {
 
                         // 数字１の入力中に、OPに行ってNUMに戻ってきたパターン
+                        // 何もせず、数字１の入力を続けていただく
                         PAD_MODE_NUM1 -> {
                         }
 
                         // 演算子入力中にスワイプで戻ってきた（＝数字の修正）
                         PAD_MODE_OP -> {
-                            // 単項演算子（√）は、OPモード・演算子ありで完了
                             if (opPadString !== "") {
+                                // 単項演算子（√など）は、opPadStringで見分けて、計算処理に戻す
+                                // 数字２も入力済みとして、OP_PAD画面へ遷移
                                 padMode = PAD_MODE_NUM2
                                 padPager.currentItem = FRAGMENT_OP_PAD
                             } else {
+                                // 演算子がまだ入っていないなら、数字１の入力修正に戻る
                                 padMode = PAD_MODE_NUM1
                             }
                         }
@@ -103,14 +110,18 @@ class MainActivity : AppCompatActivity() {
                             padMode = PAD_MODE_OP
                         }
                         // 演算子入力中に、NUM_PADに行って、さらにOP_PADに戻る
+                        // 演算子の入れ直しということにしてあげる
                         PAD_MODE_OP -> {
+                            opPadString = ""
+                            opLCD.text = ""
                         }
                         // 数字２の入力中、入力完了でOP画面にくる
                         PAD_MODE_NUM2 -> {
                             if( numPadString2!="" || opPadString==getString(R.string.pad_root)) {
+                                // 数字２入力完了 or 単項演算子の場合は計算して完了
                                 val result = calc(numPadString1, opPadString, numPadString2)
 
-                                pastLCD.text = "%s %s %s =".format(numPadString1, opPadString, numPadString2)
+                                pastLCD.text = "%s %s %s".format(numPadString1, opPadString, numPadString2)
                                 numPadString1 = result
                                 numLCD.text = numPadString1
                                 numPadString2 = ""
@@ -118,7 +129,10 @@ class MainActivity : AppCompatActivity() {
                                 opLCD.text = ""
 
                             } else {
+                                // 入力未完了でスワイプしてくる（２項演算なのに、数字２が入ってない）
                                 padMode = PAD_MODE_OP
+                                opPadString = ""
+                                opLCD.text = ""
                             }
                         }
                     }
@@ -175,7 +189,7 @@ class MainActivity : AppCompatActivity() {
                     if( padString == "" ) {
                         padString = "0"
                     } else {
-                        startTimerToOpPad()
+                        //startTimerToOpPad()
                     }
                 }
             }
@@ -228,10 +242,11 @@ class MainActivity : AppCompatActivity() {
             }
             getString(R.string.pad_ac) -> {
                 opPadString = ""
+                opLCD.text = ""
                 padMode = PAD_MODE_NUM1
                 numPadString1 = "0"
-                numLCD.text = "0"
                 numPadString2 = ""
+                numLCD.text = "0"
             }
         }
 
@@ -255,9 +270,9 @@ class MainActivity : AppCompatActivity() {
 
         // なぜか整数でも「.0」と表示されてしまうので、強引にサプレスする
         if( ret==ret.toInt().toDouble() ) {
-            return "%.9s".format(ret.toInt().toString() )
+            return "%.8s".format(ret.toInt().toString() )
         } else {
-            return "%.9s".format(ret.toString())
+            return "%.8s".format(ret.toString())
         }
     }
 

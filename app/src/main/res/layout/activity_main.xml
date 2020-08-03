@@ -17,7 +17,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#5C6C62">
+            android:background="#96A082">
 
             <TextView
                 android:id="@+id/opLCD"
@@ -37,25 +37,30 @@
                 android:id="@+id/numLCD"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:fontFamily="sans-serif-condensed-light"
+                android:layout_marginEnd="2dp"
+                android:layout_marginRight="2dp"
+                android:fontFamily="@font/dseg7"
                 android:gravity="right"
+                android:shadowColor="#464646"
+                android:shadowDx="4"
+                android:shadowDy="4"
+                android:shadowRadius="5"
                 android:text="123"
                 android:textColor="@android:color/black"
-                android:textSize="55sp"
+                android:textSize="70sp"
                 android:typeface="normal"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/pastLCD" />
+                app:layout_constraintTop_toBottomOf="@+id/pastLCD" />
 
             <TextView
                 android:id="@+id/pastLCD"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
+                android:layout_marginEnd="2dp"
+                android:layout_marginRight="2dp"
+                android:fontFamily="@font/dseg7"
                 android:gravity="right"
                 android:text="1+1 = 2"
                 android:textColor="@android:color/black"
