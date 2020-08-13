@@ -9,6 +9,7 @@ import android.widget.Button
 import androidx.viewpager.widget.ViewPager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_num_pad.*
+import kotlin.math.*
 
 // TODO: 桁あふれ時のEが無視されて、少数だけになってしまう・・・ （やっぱり、calc関数を大幅拡大せねば）
 // TODO: 左スクロールで設定画面
@@ -26,6 +27,7 @@ var numPadString1: String = ""
 var numPadString2: String = ""
 var opPadString: String = ""
 
+var maxDigits : Int = 9     // 表示可能最大桁数（これを自動で算出したいところだけど・・・）
 
 class MainActivity : AppCompatActivity() {
 
@@ -44,6 +46,16 @@ class MainActivity : AppCompatActivity() {
         numLCD.text = "hello"
         pastLCD.text = "(c)2020 5hiro"
 
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+
+        // 表示可能最大桁数を計算してみる
+        val fontWidth = numLCD.paint.measureText("8")
+        val lcdWidth = numLCD.measuredWidth
+
+        maxDigits = lcdWidth / fontWidth.toInt()+1
     }
 
     // 計算パッドの画面変更リスナー
@@ -268,12 +280,26 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // なぜか整数でも「.0」と表示されてしまうので、強引にサプレスする
-        if( ret==ret.toInt().toDouble() ) {
-            return "%.8s".format(ret.toInt().toString() )
-        } else {
-            return "%.8s".format(ret.toString())
+
+        // TODO:絶対値対応せねば！
+        // 桁あふれ対応（NEW!） 9
+        if( ret > 10.0.pow(maxDigits) ) {
+            return "%1.${maxDigits-6}e".format(ret)
         }
+
+        // 桁あふれ（小さい側）対応
+        if( ret > 0 && ret < 10.0.pow(-(maxDigits-3)) ) {
+            return "%1.${maxDigits-6}e".format(ret)
+        }
+
+        // 整数の場合。なぜか末尾に「.0」が付くのでサプレスしておく
+        if( ret==ret.toInt().toDouble() ) {
+            return "%.0f".format(ret)
+        }
+
+        // 普通に小数表示（Ｅ表示にしない）
+//        return "%f".format(ret)
+        return "%8s".format(ret.toString())
     }
 
     // ボタンテキストをいつでも最大化しよう！
