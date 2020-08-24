@@ -1,0 +1,38 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="設定画面だよ～"
+    android:summary="設定だす">
+
+    <PreferenceCategory android:title="数字パネル → 演算子パネルの遷移">
+        <SwitchPreferenceCompat
+            android:key="autoSwitch1"
+            android:title="自動遷移モード"
+            android:summaryOn="数字入力後、指定msで自動遷移する"
+            android:summaryOff="自動遷移しない"
+            android:defaultValue="true" />
+        <SeekBarPreference
+            android:key="switchTime1"
+            android:title="自動遷移時間"
+            android:summary="自動で遷移する時間をms単位で設定"
+            android:max="2000"
+            android:min="0"
+            android:defaultValue="800" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="数字パネル ← 演算子パネルの遷移">
+        <SwitchPreferenceCompat
+            android:key="autoSwitch2"
+            android:title="自動遷移モード"
+            android:summaryOn="数字入力後、指定msで自動遷移する"
+            android:summaryOff="自動遷移しない"
+            android:defaultValue="true" />
+        <SeekBarPreference
+            android:key="switchTime2"
+            android:title="自動遷移時間"
+            android:summary="自動で遷移する時間をms単位で設定"
+            android:max="1000"
+            android:min="0"
+            android:defaultValue="10" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

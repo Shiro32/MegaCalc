@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.util.TypedValue
 import android.widget.Button
+import androidx.preference.PreferenceManager
 import androidx.viewpager.widget.ViewPager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_num_pad.*
@@ -41,6 +42,7 @@ class MainActivity : AppCompatActivity() {
         padPager.adapter = PadPagerAdapter(supportFragmentManager)
         padPager.addOnPageChangeListener(PageChangeListener())
 
+        padPager.currentItem = FRAGMENT_NUM_PAD
         padMode = PAD_MODE_NUM1
         numPadString1="0"
         numLCD.text = "hello"
@@ -167,16 +169,32 @@ class MainActivity : AppCompatActivity() {
     }
 
     var mHandler = Handler()
-    val changeToOpPad = object : Runnable {
+    private val changeToOpPad = object : Runnable {
         override fun run() {
-            padPager.currentItem = 1
+            padPager.currentItem = FRAGMENT_OP_PAD
         }
     }
+    private val changeToNumPad = object : Runnable {
+        override fun run() {
+            padPager.currentItem = FRAGMENT_NUM_PAD
+        }
+    }
+
     private fun startTimerToOpPad() {
-        mHandler.postDelayed(changeToOpPad, 800)
+        val pref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+
+        if (pref.getBoolean("autoSwitch1", true) )
+            mHandler.postDelayed(changeToOpPad, pref.getInt("switchTime1", 800).toLong())
     }
     private fun stopTimerToOpPad() {
         mHandler.removeCallbacks(changeToOpPad)
+    }
+
+    private fun startTimerToNumPad() {
+        val pref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+
+        if (pref.getBoolean("autoSwitch2", false) )
+            mHandler.postDelayed(changeToNumPad, pref.getInt("switchTime2", 5).toLong())
     }
 
     // 数字パッドでボタンを押されたときの処理
@@ -260,10 +278,14 @@ class MainActivity : AppCompatActivity() {
                 opPadString = char
                 padMode = PAD_MODE_NUM2
                 opLCD.text = opPadString
+                startTimerToNumPad()
             }
             getString(R.string.pad_root) -> {
                 opPadString = char
                 padMode = PAD_MODE_OP
+                // 左画面へ移行する
+                padPager.currentItem = FRAGMENT_NUM_PAD
+
             }
             getString(R.string.pad_ac) -> {
                 opPadString = ""
@@ -272,11 +294,11 @@ class MainActivity : AppCompatActivity() {
                 numPadString1 = "0"
                 numPadString2 = ""
                 numLCD.text = "0"
+                // 左画面へ移行する
+                padPager.currentItem = FRAGMENT_NUM_PAD
             }
         }
 
-        // 左画面へ移行する
-        padPager.currentItem = 0
     }
 
 
