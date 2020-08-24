@@ -1,6 +1,7 @@
 package com.sakuraweb.fotopota.megacalc
 
 import android.graphics.Paint
+import android.graphics.Rect
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -11,10 +12,9 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_num_pad.*
 import kotlin.math.*
 
-// TODO: 桁あふれ時のEが無視されて、少数だけになってしまう・・・ （やっぱり、calc関数を大幅拡大せねば）
+// TODO: マイナス入力ができない（けどあきらめる？）
+// TODO: 計算精度がガタガタなのでBigDecimal使ってみたい！
 // TODO: 左スクロールで設定画面
-// TODO: 起動時に、何桁表示できるかをチェックしよう（whileで探すしかないか？）
-// TODO: フォントの二重重ねによる薄表示やりたい（完全モノスペースフォントが必要）
 
 const val MIN_BUTTON_TEXT_SIZE = 10F
 
@@ -48,14 +48,27 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    // 初めて聞くけど、このタイミングで文字幅計測
+    // 別のonでもいいのかもしれないけど、とりあえずここで
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
 
+/*
+        // ちょっと高度な計算
+        var r: Rect = Rect()
+        numLCD.paint.getTextBounds("0", 0, 1, r)
+        val w = r.width()
+        maxDigits = lcdWidth / w
+*/
+
         // 表示可能最大桁数を計算してみる
-        val fontWidth = numLCD.paint.measureText("8")
+        val fontWidth = numLCD.paint.measureText("0")
         val lcdWidth = numLCD.measuredWidth
 
-        maxDigits = lcdWidth / fontWidth.toInt()+1
+         maxDigits = floor(lcdWidth.toDouble() / fontWidth.toDouble() ).toInt()
+
+//        pastLCD.text = maxDigits.toString()
+//        numLCD.text = "888888888888888888888888888888888888888888888888888888".substring(0, maxDigits)
     }
 
     // 計算パッドの画面変更リスナー
@@ -284,7 +297,7 @@ class MainActivity : AppCompatActivity() {
         // TODO:絶対値対応せねば！
         // 桁あふれ対応（NEW!） 9
         if( ret > 10.0.pow(maxDigits) ) {
-            return "%1.${maxDigits-6}e".format(ret)
+            return "%1.${maxDigits-5}e".format(ret)
         }
 
         // 桁あふれ（小さい側）対応
@@ -299,7 +312,7 @@ class MainActivity : AppCompatActivity() {
 
         // 普通に小数表示（Ｅ表示にしない）
 //        return "%f".format(ret)
-        return "%8s".format(ret.toString())
+        return "%.${maxDigits}s".format(ret.toString())
     }
 
     // ボタンテキストをいつでも最大化しよう！
