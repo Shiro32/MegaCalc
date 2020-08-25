@@ -1,12 +1,19 @@
 <resources>
-    <!-- Reply Preference -->
-    <string-array name="reply_entries">
-        <item>Reply</item>
-        <item>Reply to all</item>
+    <string-array name="time_entries">
+        <item>瞬時（0ms）</item>
+        <item>速い（500ms）</item>
+        <item>普通（1000ms）</item>
+        <item>ゆっくり（1500ms）</item>
+        <item>超ゆっくり(2000ms)</item>
+        <item>自動遷移しない</item>
     </string-array>
 
-    <string-array name="reply_values">
-        <item>reply</item>
-        <item>reply_all</item>
+    <string-array name="time_values">
+        <item>0</item>
+        <item>500</item>
+        <item>1000</item>
+        <item>1500</item>
+        <item>2000</item>
+        <item>-1</item>
     </string-array>
 </resources>

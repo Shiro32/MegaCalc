@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.util.TypedValue
 import android.widget.Button
+import androidx.core.os.postDelayed
 import androidx.preference.PreferenceManager
 import androidx.viewpager.widget.ViewPager
 import kotlinx.android.synthetic.main.activity_main.*
@@ -183,8 +184,8 @@ class MainActivity : AppCompatActivity() {
     private fun startTimerToOpPad() {
         val pref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
 
-        if (pref.getBoolean("autoSwitch1", true) )
-            mHandler.postDelayed(changeToOpPad, pref.getInt("switchTime1", 800).toLong())
+        if (pref.getString("switchTimeButton1", "800") != "-1" )
+            mHandler.postDelayed(changeToOpPad, pref.getString("switchTimeButton1", "800")!!.toLong())
     }
     private fun stopTimerToOpPad() {
         mHandler.removeCallbacks(changeToOpPad)
@@ -193,8 +194,8 @@ class MainActivity : AppCompatActivity() {
     private fun startTimerToNumPad() {
         val pref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
 
-        if (pref.getBoolean("autoSwitch2", false) )
-            mHandler.postDelayed(changeToNumPad, pref.getInt("switchTime2", 5).toLong())
+        if (pref.getString("switchTimeButton2", "5") != "-1" )
+            mHandler.postDelayed(changeToNumPad, pref.getString("switchTimeButton2", "5")!!.toLong())
     }
 
     // 数字パッドでボタンを押されたときの処理
